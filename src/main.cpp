@@ -1,9 +1,9 @@
 #include <Arduino.h>
+#include <Harley.h>
+#include <Marcus.h>
 #include <ESP32Servo.h>
 
 Servo myservo;
-
-int pos = 0;
 
 void setup()
 {
@@ -18,17 +18,7 @@ void setup()
 void loop()
 {
   // put your main code here, to run repeatedly:
-
-  // Servo spins forward at full speed for 1 second.
-  myservo.write(180);
-  delay(2000);
-  // Servo is stationary for 1 second.
-  myservo.write(90);
-  delay(500);
-  // Servo spins in reverse at full speed for 1 second.
-  myservo.write(0);
-  delay(2000);
-  // Servo is stationary for 1 second.
-  myservo.write(90);
-  delay(500);
+  // marcusServoTest(myservo);  // test if a servo is working
+  // marcusBlink(500);
+  harleyBlink(250);
 }
