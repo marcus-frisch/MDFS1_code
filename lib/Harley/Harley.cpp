@@ -14,7 +14,7 @@ void harleyBlink(int time)
     delay(time);
 }
 
-void harleyServoTest(Servo servoMotor)
+void harleyServoTest(Servo &servoMotor)
 {
     // Servo spins forward at full speed for 1 second.
     servoMotor.write(180);
