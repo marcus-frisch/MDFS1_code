@@ -34,7 +34,7 @@ void initialiseOled()
     display.display();
 }
 
-void initialiseJoystickIR()
+void initialiseJoystickIR() // initialise pins we need
 {
     pinMode(IR, INPUT);
     pinMode(JOYX, INPUT);
@@ -42,18 +42,18 @@ void initialiseJoystickIR()
     pinMode(BUTTON, INPUT);
 }
 
-bool readButton()
+bool readButton() // this reads one of the touch pins on an esp32
 {
-    static int buttonRest = touchRead(BUTTON);
+    static int buttonRest = touchRead(BUTTON); // define what the capacitance is when no one is touching the button
 
-    static bool pressDetected = false;
+    static bool pressDetected = false; // has any present touch already been detected
 
-    if (touchRead(BUTTON) < buttonRest - 30 && !pressDetected)
+    if (touchRead(BUTTON) < buttonRest - 30 && !pressDetected) // detect a press (that hasn't already been detected)
     {
         pressDetected = true;
         return 1;
     }
-    else if (touchRead(BUTTON) > buttonRest - 20 && pressDetected)
+    else if (touchRead(BUTTON) > buttonRest - 20 && pressDetected) // reset and prepare for a future press when no longer pressed
     {
         pressDetected = false;
     }
@@ -61,7 +61,7 @@ bool readButton()
     return 0;
 }
 
-void marcusBlink(int time)
+void marcusBlink(int time) // blink onboard LED (used for debugging/testing)
 {
     // Serial.println("Blink!");
     pinMode(2, OUTPUT);
@@ -72,7 +72,7 @@ void marcusBlink(int time)
     delay(time);
 }
 
-int servoJoystickX()
+int servoJoystickX() // return the reading of a joysticks X axis, specifically for servo control
 {
     int value = analogRead(JOYX);
     value = map(value, 0, 4095, 0, 180);
@@ -93,7 +93,7 @@ int servoJoystickX()
     return value;
 }
 
-void marcusServoTest(Servo &servoMotor)
+void marcusServoTest(Servo &servoMotor) // test a servo motors functionality
 {
     // Servo spins forward at full speed for 1 second.
     servoMotor.write(100);
@@ -113,9 +113,9 @@ void marcusServoTest(Servo &servoMotor)
     delay(1000);
 }
 
-void installTube(Servo &servoMotor)
+void installTube(Servo &servoMotor) // used to aid with the installation and homing of a tube upon startup
 {
-    static int installState = 0; // 0 manual, 1 auto homing
+    static int installState = 0; // 0 manual install (load in tube), 1 auto homing (position tube into bottom of arm assembly)
 
     while (installState < 2)
     {
