@@ -5,23 +5,40 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <ESP32Encoder.h>
 
-Servo tubeServo;
+Servo tubeServo1;
+Servo tubeServo2;
+ESP32Encoder tubeEncoder;
+
+// tube length positions (these are placeholder values and completely wrong)
+#define T_FULL_RETRACT 0
+#define T_SEED_1 50
+#define T_SEED_2 100
+#define T_SEED_3 150
+#define T_SEED_4 200
+#define T_SEED_5 250
+#define T_SEED_6 300
 
 void setup()
 {
   // put your setup code here, to run once:
   Serial.begin(9600);
 
-  // The servo control wire is connected to Arduino D2 pin.
-  tubeServo.attach(12);
-  // Servo is stationary.
-  tubeServo.write(90);
+  // these are the two servo motors responcible for extending/retracting the tube
+  tubeServo1.attach(12);
+  tubeServo2.attach(13);
+  // ensure the servos are stationary upon startup
+  tubeServo1.write(90);
+  tubeServo2.write(90);
+
+  tubeEncoder.attachHalfQuad(23, 22);
+  tubeEncoder.setCount(0);
 
   initialiseOled();
   initialiseJoystickIR();
 
-  installTube(tubeServo);
+  installTube(tubeServo1, tubeServo2);
 }
 
 void loop()

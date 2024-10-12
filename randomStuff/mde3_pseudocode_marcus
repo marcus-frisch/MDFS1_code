@@ -1,0 +1,27 @@
+BEGIN installTube(servoMotor, servoMotor1)
+    SET installState to 0
+
+    WHILE installState IS LESS THAN 2:
+        IF installState IS EQUAL to 0:
+            Output "Load Tube" message on OLED
+            Write to servoMotor reading from servoJoystickX()
+            Write to servoMotor1 reading from servoJoystickX()
+
+            IF readButton() IS TRUE:
+                INCREMENT installState BY 1
+            END IF
+        ELSE IF installState IS EQUAL to 1:
+            Output "Auto Home" message on OLED
+            IF digitalRead(IR) IS TRUE:
+                Write to servoMotor to rotate counter-clockwise slowly
+                Write to servoMotor1 to rotate counter-clockwise slowly
+            ELSE IF:
+                Write to servoMotor to stop rotation
+                Write to servoMotor1 to stop rotation
+                INCREMENT installState BY 1
+                Output "Next stage" message on OLED
+            END IF
+        END IF
+    END WHILE
+END installTube
+

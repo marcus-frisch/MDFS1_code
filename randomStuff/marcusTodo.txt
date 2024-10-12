@@ -1,0 +1,3 @@
+To do list:
+* experiment with rot encoder getCount and find counter values for each seed pod
+* check direction of IF statement (getCount & desiredCount)

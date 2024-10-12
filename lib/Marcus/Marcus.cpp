@@ -1,7 +1,5 @@
 
 #include "Marcus.h"
-#include "../include/pinDef.h"
-
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
@@ -83,27 +81,34 @@ int servoJoystickX() // return the reading of a joysticks X axis, specifically f
     return value;
 }
 
-void marcusServoTest(Servo &servoMotor) // test a servo motors functionality
+void marcusServoTest(Servo &servoMotor, Servo &servoMotor1) // test a servo motors functionality
 {
     // Servo spins forward at full speed for 1 second.
+    servoMotor.write(100);
     servoMotor.write(100);
     Serial.println("Forwards!");
     delay(2000);
     // Servo is stationary for 1 second.
     servoMotor.write(90);
+    servoMotor1.write(90);
+
     Serial.println("Stopped!");
     delay(1000);
     // Servo spins in reverse at full speed for 1 second.
     servoMotor.write(80);
+    servoMotor1.write(80);
+
     Serial.println("Backwards!");
     delay(2000);
     // Servo is stationary for 1 second.
     servoMotor.write(90);
+    servoMotor1.write(90);
+
     Serial.println("Stopped!");
     delay(1000);
 }
 
-void installTube(Servo &servoMotor) // used to aid with the installation and homing of a tube upon startup
+void installTube(Servo &servoMotor, Servo &servoMotor1) // used to aid with the installation and homing of a tube upon startup
 {
     static int installState = 0; // 0 manual install (load in tube), 1 auto homing (position tube into bottom of arm assembly)
 
@@ -143,6 +148,7 @@ void installTube(Servo &servoMotor) // used to aid with the installation and hom
             display.display();
 
             servoMotor.write(servoJoystickX());
+            servoMotor1.write(servoJoystickX());
 
             if (readButton())
             {
@@ -165,10 +171,13 @@ void installTube(Servo &servoMotor) // used to aid with the installation and hom
             if (digitalRead(IR))
             {
                 servoMotor.write(110);
+                servoMotor1.write(110);
             }
             else
             {
                 servoMotor.write(90);
+                servoMotor1.write(90);
+
                 installState++;
                 display.invertDisplay(false);
                 display.clearDisplay();
@@ -179,4 +188,36 @@ void installTube(Servo &servoMotor) // used to aid with the installation and hom
             }
         }
     }
+}
+
+bool setTubePos(long desiredCount, ESP32Encoder &rotEncoder, Servo &servoMotor, Servo &servoMotor1)
+{ // takes a known counter value and sets the tube to that position (extending/retracting) - returns true once tube is in position
+
+    if (rotEncoder.getCount() > desiredCount)
+    {
+        servoMotor.write(110); // speeds should be tested & updated
+        servoMotor1.write(110);
+    }
+    else if (rotEncoder.getCount() < desiredCount)
+    {
+        servoMotor.write(70); // speeds should be tested & updated
+        servoMotor1.write(70);
+    }
+    else
+    {
+        servoMotor.write(90);
+        servoMotor1.write(90);
+        return true;
+    }
+    return false;
+}
+
+void blocking_setTubePos(long desiredCount, ESP32Encoder &rotEncoder, Servo &servoMotor, Servo &servoMotor1) // blocks other code and only allows tube to be positioned (used for testing)
+{
+    bool tubeDone = false;
+
+    do
+    {
+        tubeDone = setTubePos(desiredCount, rotEncoder, servoMotor, servoMotor1);
+    } while (!tubeDone);
 }
