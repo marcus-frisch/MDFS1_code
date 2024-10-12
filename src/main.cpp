@@ -45,8 +45,7 @@ void loop()
 {
   // put your main code here, to run repeatedly:
 
-  // marcusBlink(500);
-  // harleyBlink(250);
+  blocking_setTubePos(T_SEED_1, tubeEncoder, tubeServo1, tubeServo2); // extend tube to seed 1 collection position
 
-  // Serial.println("Touch: " + String(touchRead(4)) + " M: " + String(readButton()) + " State: " + String(state));
+  // harleyBlink(250);
 }
