@@ -108,7 +108,7 @@ void marcusServoTest(Servo &servoMotor, Servo &servoMotor1) // test a servo moto
     delay(1000);
 }
 
-void installTube(Servo &servoMotor, Servo &servoMotor1) // used to aid with the installation and homing of a tube upon startup
+void installTube(Servo &servoMotor, Servo &servoMotor1, ESP32Encoder &rotEncoder) // used to aid with the installation and homing of a tube upon startup
 {
     static int installState = 0; // 0 manual install (load in tube), 1 auto homing (position tube into bottom of arm assembly)
 
@@ -177,6 +177,7 @@ void installTube(Servo &servoMotor, Servo &servoMotor1) // used to aid with the 
             {
                 servoMotor.write(90);
                 servoMotor1.write(90);
+                rotEncoder.setCount(0);
 
                 installState++;
                 display.invertDisplay(false);

@@ -43,7 +43,7 @@ void marcusServoTest(Servo &servoMotor, Servo &servoMotor1);
 /**
  * @brief initial install of tube into the robot (requires operator assistance)
  */
-void installTube(Servo &servoMotor, Servo &servoMotor1);
+void installTube(Servo &servoMotor, Servo &servoMotor1, ESP32Encoder &rotEncoder);
 
 /**
  * @brief set the tube to a known position by known rotary encoder counter values
