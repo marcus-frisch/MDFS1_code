@@ -1,15 +1,23 @@
-#include <Arduino.h>
 #include <Harley.h>
 #include <Marcus.h>
-#include <ESP32Servo.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <ESP32Encoder.h>
+#include "../../include/pinDef.h"
+#include "../../include/libDef.h"
 
-Servo tubeServos;
+
+
+Servo tubeServo0;
+Servo tubeServo1;
 Servo hingeServo;
 ESP32Encoder tubeEncoder;
+AccelStepper fr(AccelStepper::DRIVER, STEP, DIR);
+AccelStepper fl(AccelStepper::DRIVER, STEP, DIR);
+AccelStepper br(AccelStepper::DRIVER, STEP, DIR);
+AccelStepper bl(AccelStepper::DRIVER, STEP, DIR);
+MultiStepper steppers;
+
 
 // tube length positions (these are placeholder values and completely wrong)
 #define T_FULL_RETRACT 0
@@ -23,76 +31,68 @@ ESP32Encoder tubeEncoder;
 
 
 
-// void setup()
-// {
+void setup()
+{
+    setupPins();//function in the pindef file whihc sets the input or output or other values of a pin
+
 //   Serial.begin(115200);
 
-//   // these are the two servo motors responcible for extending/retracting the tube
-//   tubeServos.attach(12);
-//   // ensure the servos are stationary upon startup
-//   tubeServos.write(0);
+  // these are the two servo motors responcible for extending/retracting the tube
+  tubeServo0.attach(12);
+  tubeServo1.write(0);
 
-//   // tubeEncoder.attachHalfQuad(23, 22);
-//   // tubeEncoder.setCount(0);
+  tubeEncoder.attachHalfQuad(23, 22);
+  tubeEncoder.setCount(0);
 
-//   // initialiseOled();
-//   // initialiseJoystickIR();
+  initialiseOled();
+  initialiseJoystickIR();
 
-//   // installTube(tubeServos, tubeEncoder);
-// }
+  setupSteppers(fl, fr, bl, br);
+  setupMultiSteppers(steppers, fl, fr, bl, br);
+
+  // installTube(tubeServos, tubeEncoder);
+}
+
+void run(){
+    // picks up first ball
+    hingeMovement(180, hingeServo);
+    blocking_setTubePos(100, tubeEncoder, tubeServo0, tubeServo1);//tube movement out
+    hingeMovement(90, hingeServo);
+    blocking_setTubePos(0, tubeEncoder, tubeServo0, tubeServo1);//tube movement in 
+
+    
+    //moves to and picks up second ball
+    moveForward(500, steppers);
+    hingeMovement(180, hingeServo);
+    blocking_setTubePos(300, tubeEncoder, tubeServo0, tubeServo1);//tube movement out 
+    hingeMovement(90, hingeServo);
+    blocking_setTubePos(0, tubeEncoder, tubeServo0, tubeServo1);//tube movement in 
+
+    
+    //move to and picks up thrid ball
+    moveForward(500, steppers);
+    hingeMovement(180, hingeServo);
+    blocking_setTubePos(100, tubeEncoder, tubeServo0, tubeServo1);//tube movement out 
+    hingeMovement(90, hingeServo);
+    blocking_setTubePos(0, tubeEncoder, tubeServo0, tubeServo1);//tube movement in 
+
+    rotateClockwise(500, steppers);
+
+
+
+
+
+}
+
+
+
 
 
 // void loop()
 // {
-//   // put your main code here, to run repeatedly:
-//     tubeServos.write(0);
-//     delay(2000);
-//     tubeServos.write(90);
-//     delay(2000);
-//     tubeServos.write(180);
-//     delay(2000);
-
-
 
 
 //   // blocking_setTubePos(T_SEED_1, tubeEncoder, tubeServos); // extend tube to seed 1 collection position
 
 //   // harleyBlink(250);
 // }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// code for woring stepper
-#define DIR 2
-#define STEP 15
-
-
-#include <AccelStepper.h>
-
-AccelStepper stepper3(AccelStepper::DRIVER, STEP, DIR);
-
-void setup()
-{  
-    stepper3.setMaxSpeed(1000.0);
-    stepper3.setAcceleration(300.0);
-    stepper3.moveTo(1000); 
-}
-
-void loop()
-{
-    stepper3.runToPosition();
-    stepper3.moveTo(1000); 
-
-}
