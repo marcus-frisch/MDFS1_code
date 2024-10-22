@@ -7,8 +7,8 @@
 #include <Adafruit_SSD1306.h>
 #include <ESP32Encoder.h>
 
-Servo tubeServo1;
-Servo tubeServo2;
+Servo tubeServos;
+Servo hingeServo;
 ESP32Encoder tubeEncoder;
 
 // tube length positions (these are placeholder values and completely wrong)
@@ -20,32 +20,79 @@ ESP32Encoder tubeEncoder;
 #define T_SEED_5 250
 #define T_SEED_6 300
 
+
+
+
+// void setup()
+// {
+//   Serial.begin(115200);
+
+//   // these are the two servo motors responcible for extending/retracting the tube
+//   tubeServos.attach(12);
+//   // ensure the servos are stationary upon startup
+//   tubeServos.write(0);
+
+//   // tubeEncoder.attachHalfQuad(23, 22);
+//   // tubeEncoder.setCount(0);
+
+//   // initialiseOled();
+//   // initialiseJoystickIR();
+
+//   // installTube(tubeServos, tubeEncoder);
+// }
+
+
+// void loop()
+// {
+//   // put your main code here, to run repeatedly:
+//     tubeServos.write(0);
+//     delay(2000);
+//     tubeServos.write(90);
+//     delay(2000);
+//     tubeServos.write(180);
+//     delay(2000);
+
+
+
+
+//   // blocking_setTubePos(T_SEED_1, tubeEncoder, tubeServos); // extend tube to seed 1 collection position
+
+//   // harleyBlink(250);
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// code for woring stepper
+#define DIR 2
+#define STEP 15
+
+
+#include <AccelStepper.h>
+
+AccelStepper stepper3(AccelStepper::DRIVER, STEP, DIR);
+
 void setup()
-{
-  // put your setup code here, to run once:
-  Serial.begin(9600);
-
-  // these are the two servo motors responcible for extending/retracting the tube
-  tubeServo1.attach(12);
-  tubeServo2.attach(13);
-  // ensure the servos are stationary upon startup
-  tubeServo1.write(90);
-  tubeServo2.write(90);
-
-  tubeEncoder.attachHalfQuad(23, 22);
-  tubeEncoder.setCount(0);
-
-  initialiseOled();
-  initialiseJoystickIR();
-
-  installTube(tubeServo1, tubeServo2);
+{  
+    stepper3.setMaxSpeed(1000.0);
+    stepper3.setAcceleration(300.0);
+    stepper3.moveTo(1000); 
 }
 
 void loop()
 {
-  // put your main code here, to run repeatedly:
+    stepper3.runToPosition();
+    stepper3.moveTo(1000); 
 
-  blocking_setTubePos(T_SEED_1, tubeEncoder, tubeServo1, tubeServo2); // extend tube to seed 1 collection position
-
-  // harleyBlink(250);
 }
