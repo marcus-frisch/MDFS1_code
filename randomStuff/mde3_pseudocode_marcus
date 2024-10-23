@@ -1,4 +1,6 @@
-BEGIN installTube(servoMotor, servoMotor1)
+LOADING IN TUBE:
+
+BEGIN installTube(servoMotor, servoMotor1, rotaryEncoder)
     SET installState to 0
 
     WHILE installState IS LESS THAN 2:
@@ -13,15 +15,34 @@ BEGIN installTube(servoMotor, servoMotor1)
         ELSE IF installState IS EQUAL to 1:
             Output "Auto Home" message on OLED
             IF digitalRead(IR) IS TRUE:
-                Write to servoMotor to rotate counter-clockwise slowly
-                Write to servoMotor1 to rotate counter-clockwise slowly
-            ELSE IF:
-                Write to servoMotor to stop rotation
-                Write to servoMotor1 to stop rotation
+                Write to servoMotor to rotate COUNTER-CLOCKWISE SLOWLY
+                Write to servoMotor1 to rotate COUNTER-CLOCKWISE SLOWLY
+            ELSE:
+                Write to servoMotor to STOP rotation
+                Write to servoMotor1 to STOP rotation
+                SET rotaryEncoder count to 1
                 INCREMENT installState BY 1
                 Output "Next stage" message on OLED
             END IF
         END IF
     END WHILE
 END installTube
+
+
+
+BEGIN setTubePos(desired_count, rotaryEncoder, servoMotor, servoMotor1)
+    IF rotaryEncoder counter IS GREATER THAN desired_count:
+        Write to servoMotor to rotate CLOCKWISE SLOWLY
+        Write to servoMotor1 to rotate CLOCKWISE SLOWLY
+    ELSE IF rotaryEncoder counter IS LESS THAN desired_count:
+        Write to servoMotor to rotate COUNTER-CLOCKWISE SLOWLY
+        Write to servoMotor1 to rotate COUNTER-CLOCKWISE SLOWLY
+    ELSE:
+        Write to servoMotor to STOP rotation
+        Write to servoMotor1 to STOP rotation
+        return TRUE
+    END IF
+    return FALSE
+END setTubePos
+
 

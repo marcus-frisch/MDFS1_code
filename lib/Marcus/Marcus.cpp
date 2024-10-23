@@ -1,5 +1,11 @@
-
 #include "Marcus.h"
+
+static int receivedJoystickX = 2048;
+static int receivedJoystickY = 0;
+static int receivedTouchReading = 0;
+
+String oledTop = "Top";
+String oledBottom = "Bottom";
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
@@ -30,18 +36,25 @@ void initialiseJoystickIR() // initialise pins we need
     pinMode(BUTTON, INPUT);
 }
 
+void updateRecievedRemote(int joyX, int joyY, int touch)
+{
+    receivedJoystickX = joyX;
+    receivedJoystickY = joyY;
+    receivedTouchReading = touch;
+}
+
 bool readButton() // this reads one of the touch pins on an esp32
 {
-    static int buttonRest = touchRead(BUTTON); // define what the capacitance is when no one is touching the button
+    static int buttonRest = receivedTouchReading; // define what the capacitance is when no one is touching the button
 
     static bool pressDetected = false; // has any present touch already been detected
 
-    if (touchRead(BUTTON) < buttonRest - 30 && !pressDetected) // detect a press (that hasn't already been detected)
+    if (receivedTouchReading < buttonRest - 30 && !pressDetected) // detect a press (that hasn't already been detected)
     {
         pressDetected = true;
         return 1;
     }
-    else if (touchRead(BUTTON) > buttonRest - 20 && pressDetected) // reset and prepare for a future press when no longer pressed
+    else if (receivedTouchReading > buttonRest - 20 && pressDetected) // reset and prepare for a future press when no longer pressed
     {
         pressDetected = false;
     }
@@ -60,9 +73,31 @@ void marcusBlink(int time) // blink onboard LED (used for debugging/testing)
     delay(time);
 }
 
+void printText(String topLine, String bottomLine)
+{
+    oledTop = topLine;
+    oledBottom = bottomLine;
+}
+
+void statusLed(bool status)
+{
+    int interval = 200;
+    static unsigned long lastFlash = 0;
+
+    if (status)
+    {
+        interval = 800;
+    }
+
+    if (millis() >= lastFlash + interval)
+    {
+        digitalWrite(LED, !digitalRead(LED));
+    }
+}
+
 int servoJoystickX() // return the reading of a joysticks X axis, specifically for servo control
 {
-    int value = analogRead(JOYX);
+    int value = receivedJoystickX;
     value = map(value, 0, 4095, 0, 180);
 
     if (value < 122) // yes this IF stuff is weird, but my joystick in neutral position outputs 122 when 90 is expected.
@@ -81,33 +116,6 @@ int servoJoystickX() // return the reading of a joysticks X axis, specifically f
     return value;
 }
 
-void marcusServoTest(Servo &servoMotor, Servo &servoMotor1) // test a servo motors functionality
-{
-    // Servo spins forward at full speed for 1 second.
-    servoMotor.write(100);
-    servoMotor.write(100);
-    Serial.println("Forwards!");
-    delay(2000);
-    // Servo is stationary for 1 second.
-    servoMotor.write(90);
-    servoMotor1.write(90);
-
-    Serial.println("Stopped!");
-    delay(1000);
-    // Servo spins in reverse at full speed for 1 second.
-    servoMotor.write(80);
-    servoMotor1.write(80);
-
-    Serial.println("Backwards!");
-    delay(2000);
-    // Servo is stationary for 1 second.
-    servoMotor.write(90);
-    servoMotor1.write(90);
-
-    Serial.println("Stopped!");
-    delay(1000);
-}
-
 void installTube(Servo &servoMotor, Servo &servoMotor1, ESP32Encoder &rotEncoder) // used to aid with the installation and homing of a tube upon startup
 {
     static int installState = 0; // 0 manual install (load in tube), 1 auto homing (position tube into bottom of arm assembly)
@@ -116,36 +124,18 @@ void installTube(Servo &servoMotor, Servo &servoMotor1, ESP32Encoder &rotEncoder
     {
         if (installState == 0)
         {
-            display.clearDisplay();
-            display.setTextColor(WHITE);
-            display.setCursor(0, 0);
-            display.setTextSize(2);
-            display.println("Load Tube");
-            display.setTextSize(1);
-            display.setCursor(0, 20);
-            display.println("Use Joystick, then\npush button.");
-
-            String tubeMovement = "";
             if (servoJoystickX() < 88)
             {
-                tubeMovement = "Extending";
+                printText("LTube", "Extending");
             }
             else if (servoJoystickX() > 92)
             {
-                tubeMovement = "Retracting";
+                printText("LTube", "Retracting");
             }
             else
             {
-                tubeMovement = "Idle";
+                printText("LTube", "Idle");
             }
-            display.setTextSize(2);
-            display.setCursor(0, 40);
-            display.println(tubeMovement);
-            display.setTextSize(1);
-            display.setCursor(0, 55);
-            display.println(String(servoJoystickX()));
-
-            display.display();
 
             servoMotor.write(servoJoystickX());
             servoMotor1.write(servoJoystickX());
@@ -157,16 +147,7 @@ void installTube(Servo &servoMotor, Servo &servoMotor1, ESP32Encoder &rotEncoder
         }
         else if (installState == 1)
         {
-            display.clearDisplay();
-            display.setTextColor(WHITE);
-            display.setCursor(0, 0);
-            display.setTextSize(2);
-            display.println("Auto Home");
-            display.setTextSize(1);
-            display.setCursor(0, 20);
-            display.println("Give us a sec");
-            display.invertDisplay(true);
-            display.display();
+            printText("AutoHome", "Please wait...");
 
             if (digitalRead(IR))
             {
@@ -180,12 +161,7 @@ void installTube(Servo &servoMotor, Servo &servoMotor1, ESP32Encoder &rotEncoder
                 rotEncoder.setCount(0);
 
                 installState++;
-                display.invertDisplay(false);
-                display.clearDisplay();
-                display.setCursor(0, 0);
-                display.setTextSize(1);
-                display.println("Next stage");
-                display.display();
+                printText("Done", "Tube loaded");
             }
         }
     }
