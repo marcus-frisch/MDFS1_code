@@ -1,15 +1,23 @@
-#include <Arduino.h>
 #include <Harley.h>
 #include <Marcus.h>
-#include <ESP32Servo.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <ESP32Encoder.h>
+#include "../../include/pinDef.h"
+#include "../../include/libDef.h"
 
+
+
+Servo tubeServo0;
 Servo tubeServo1;
-Servo tubeServo2;
+Servo hingeServo;
 ESP32Encoder tubeEncoder;
+AccelStepper fr(AccelStepper::DRIVER, STEP, DIR);
+AccelStepper fl(AccelStepper::DRIVER, STEP, DIR);
+AccelStepper br(AccelStepper::DRIVER, STEP, DIR);
+AccelStepper bl(AccelStepper::DRIVER, STEP, DIR);
+MultiStepper steppers;
+
 
 // tube length positions (these are placeholder values and completely wrong)
 #define T_FULL_RETRACT 0
@@ -20,17 +28,18 @@ ESP32Encoder tubeEncoder;
 #define T_SEED_5 250
 #define T_SEED_6 300
 
+
+
+
 void setup()
 {
-  // put your setup code here, to run once:
-  Serial.begin(9600);
+    setupPins();//function in the pindef file whihc sets the input or output or other values of a pin
+
+//   Serial.begin(115200);
 
   // these are the two servo motors responcible for extending/retracting the tube
-  tubeServo1.attach(12);
-  tubeServo2.attach(13);
-  // ensure the servos are stationary upon startup
-  tubeServo1.write(90);
-  tubeServo2.write(90);
+  tubeServo0.attach(12);
+  tubeServo1.write(0);
 
   tubeEncoder.attachHalfQuad(23, 22);
   tubeEncoder.setCount(0);
@@ -38,14 +47,52 @@ void setup()
   initialiseOled();
   initialiseJoystickIR();
 
-  installTube(tubeServo1, tubeServo2);
+  setupSteppers(fl, fr, bl, br);
+  setupMultiSteppers(steppers, fl, fr, bl, br);
+
+  // installTube(tubeServos, tubeEncoder);
 }
 
-void loop()
-{
-  // put your main code here, to run repeatedly:
+void run(){
+    // picks up first ball
+    hingeMovement(180, hingeServo);
+    blocking_setTubePos(100, tubeEncoder, tubeServo0, tubeServo1);//tube movement out
+    hingeMovement(90, hingeServo);
+    blocking_setTubePos(0, tubeEncoder, tubeServo0, tubeServo1);//tube movement in 
 
-  blocking_setTubePos(T_SEED_1, tubeEncoder, tubeServo1, tubeServo2); // extend tube to seed 1 collection position
+    
+    //moves to and picks up second ball
+    moveForward(500, steppers);
+    hingeMovement(180, hingeServo);
+    blocking_setTubePos(300, tubeEncoder, tubeServo0, tubeServo1);//tube movement out 
+    hingeMovement(90, hingeServo);
+    blocking_setTubePos(0, tubeEncoder, tubeServo0, tubeServo1);//tube movement in 
 
-  // harleyBlink(250);
+    
+    //move to and picks up thrid ball
+    moveForward(500, steppers);
+    hingeMovement(180, hingeServo);
+    blocking_setTubePos(100, tubeEncoder, tubeServo0, tubeServo1);//tube movement out 
+    hingeMovement(90, hingeServo);
+    blocking_setTubePos(0, tubeEncoder, tubeServo0, tubeServo1);//tube movement in 
+
+    rotateClockwise(500, steppers);
+
+
+
+
+
 }
+
+
+
+
+
+// void loop()
+// {
+
+
+//   // blocking_setTubePos(T_SEED_1, tubeEncoder, tubeServos); // extend tube to seed 1 collection position
+
+//   // harleyBlink(250);
+// }
