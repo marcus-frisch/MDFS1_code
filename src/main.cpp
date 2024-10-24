@@ -3,6 +3,12 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <AccelStepper.h>
+#include <MultiStepper.h>
+#include <ESP32Servo.h>
+#include <Arduino.h>
+#include <ESP32Encoder.h>
+
 #include "../../include/pinDef.h"
 #include "../../include/libDef.h"
 
@@ -88,11 +94,11 @@ void run(){
 
 
 
-// void loop()
-// {
+void loop()
+{
 
 
-//   // blocking_setTubePos(T_SEED_1, tubeEncoder, tubeServos); // extend tube to seed 1 collection position
+  // blocking_setTubePos(T_SEED_1, tubeEncoder, tubeServos); // extend tube to seed 1 collection position
 
-//   // harleyBlink(250);
-// }
+  // harleyBlink(250);
+}

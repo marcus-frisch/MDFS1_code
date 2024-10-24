@@ -1,8 +1,11 @@
 #ifndef HARLEY_H
 #define HARLEY_H
 
-#include "../../include/libDef.h"
+// #include "../../include/libDef.h"
 #include "../../include/pinDef.h"
+#include <AccelStepper.h>
+#include <MultiStepper.h>
+#include <ESP32Servo.h>
 
 
 void hingeMovement(int degree, Servo &servo);

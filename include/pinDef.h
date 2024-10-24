@@ -1,4 +1,5 @@
-#include "../../include/libDef.h"
+// #include "../../include/libDef.h"
+#include <Arduino.h>
 
 #ifndef PINDEF_H
 #define PINDEF_H

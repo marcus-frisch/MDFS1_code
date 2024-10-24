@@ -28,67 +28,61 @@ void setupSteppers(AccelStepper &fl, AccelStepper &fr, AccelStepper &bl, AccelSt
 }
 
 void moveForward(long step, MultiStepper &steppers){
-    long positions[step, step, step, step];
+    long positions[4] = {step, step, step, step}; 
     steppers.moveTo(positions);
     steppers.runSpeedToPosition(); //blocking function
 }
 
 void moveBackwards(long step, MultiStepper &steppers){
-    long positions[-step, -step, -step, -step];
+    long positions[4] = {-step, -step, -step, -step};
     steppers.moveTo(positions);
     steppers.runSpeedToPosition();
 }
 
 void moveLeft(long step, MultiStepper &steppers){
-    long positions[step, -step, -step, step];
+    long positions[4] = {step, -step, -step, step};
     steppers.moveTo(positions);
     steppers.runSpeedToPosition();
 }
 
 void moveRight(long step, MultiStepper &steppers){
-    long positions[-step, step, step, -step];
+    long positions[4] = {-step, step, step, -step};
     steppers.moveTo(positions);
     steppers.runSpeedToPosition();
 }
 
 void moveDFR(long step, MultiStepper &steppers){ //move diagonal front right
-    long positions[step, 0, 0, step];
+    long positions[4] = {step, 0, 0, step};
     steppers.moveTo(positions);
     steppers.runSpeedToPosition();
 }
 
 void moveDFl(long step, MultiStepper &steppers){ //move diagonal front left
-    long positions[0, step, step, 0];
-    steppers.moveTo(positions);
-    steppers.runSpeedToPosition();
-}
-
-void moveDFR(long step, MultiStepper &steppers){ //move diagonal front right
-    long positions[step, 0, 0, step];
+    long positions[4] = {0, step, step, 0};
     steppers.moveTo(positions);
     steppers.runSpeedToPosition();
 }
 
 void moveDBL(long step, MultiStepper &steppers){ //move diagonal back right
-    long positions[-step, 0, 0, -step];
+    long positions[4] = {-step, 0, 0, -step};
     steppers.moveTo(positions);
     steppers.runSpeedToPosition();
 }
 
 void moveDBR(long step, MultiStepper &steppers){ //move diagonal back left
-    long positions[0, -step, -step, 0];
+    long positions[4] = {0, -step, -step, 0};
     steppers.moveTo(positions);
     steppers.runSpeedToPosition();
 }
 
 void rotateClockwise(long step, MultiStepper &steppers){
-    long positions[step, -step, step, -step];
+    long positions[4] = {0, -step, -step, 0};
     steppers.moveTo(positions);
     steppers.runSpeedToPosition();
 }
 
 void rotateAntiClockwise(long step, MultiStepper &steppers){
-    long positions[-step, step, -step, step];
+    long positions[4] = {-step, step, -step, step};
     steppers.moveTo(positions);
     steppers.runSpeedToPosition();
 }
