@@ -13,17 +13,18 @@ void setupMultiSteppers(MultiStepper &steppers,AccelStepper &fl, AccelStepper &f
 
 
 void setupSteppers(AccelStepper &fl, AccelStepper &fr, AccelStepper &bl, AccelStepper &br){
-    fl.setMaxSpeed(1000.0);
-    // fl.setAcceleration(300.0);
+    fl.setMaxSpeed(1000);
+    // fl.setAcceleration(300);
 
-    fr.setMaxSpeed(1000.0);
-    // fr.setAcceleration(300.0);
 
-    bl.setMaxSpeed(1000.0);
-    // bl.setAcceleration(300.0);
+    fr.setMaxSpeed(1000);
+    // fr.setAcceleration(300);
 
-    br.setMaxSpeed(1000.0);
-    // br.setAcceleration(300.0);
+    bl.setMaxSpeed(1000);
+    // bl.setAcceleration(300);
+
+    br.setMaxSpeed(1000);
+    // br.setAcceleration(300);
 
 }
 

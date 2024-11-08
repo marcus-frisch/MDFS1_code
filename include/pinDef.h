@@ -9,7 +9,7 @@
 #define DIR2 16
 #define STEP2 4
 #define DIR3 5
-#define STEP3 7
+#define STEP3 17
 #define DIR4 19
 #define STEP4 18
 #define HINGE 21
@@ -30,14 +30,14 @@ inline void setupPins(){
     pinMode(JOYY, OUTPUT);
     pinMode(IR, OUTPUT);
 
-    pinMode(DIR1, OUTPUT);
-    pinMode(STEP1, OUTPUT);
-    pinMode(DIR2, OUTPUT);
-    pinMode(STEP2, OUTPUT);
-    pinMode(DIR3, OUTPUT);
-    pinMode(STEP3, OUTPUT);
-    pinMode(DIR4, OUTPUT);
-    pinMode(STEP4, OUTPUT);
+    // pinMode(DIR1, OUTPUT);
+    // pinMode(STEP1, OUTPUT);
+    // pinMode(DIR2, OUTPUT);
+    // pinMode(STEP2, OUTPUT);
+    // pinMode(DIR3, OUTPUT);
+    // pinMode(STEP3, OUTPUT);
+    // pinMode(DIR4, OUTPUT);
+    // pinMode(STEP4, OUTPUT);
 
 }
 
