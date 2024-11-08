@@ -27,6 +27,7 @@ void setupSteppers(AccelStepper &fl, AccelStepper &fr, AccelStepper &bl, AccelSt
 
 }
 
+
 void moveForward(long step, MultiStepper &steppers){
     long positions[4] = {step, step, step, step}; 
     steppers.moveTo(positions);
@@ -87,7 +88,11 @@ void rotateAntiClockwise(long step, MultiStepper &steppers){
     steppers.runSpeedToPosition();
 }
 
-
+void incinerate(Servo &servo){
+    servo.write(90);
+    delay(1000);
+    servo.write(0);
+}
 
 
 

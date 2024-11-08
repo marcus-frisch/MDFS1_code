@@ -14,7 +14,7 @@ void setupMultiSteppers(MultiStepper &steppers, AccelStepper &fl, AccelStepper &
 
 void setupSteppers(AccelStepper &fl, AccelStepper &fr, AccelStepper &bl, AccelStepper &br);
 
-void moveForward(int step, MultiStepper &steppers);
+void moveForward(long step, MultiStepper &steppers);
 
 void moveBackwards(long step, MultiStepper &steppers);
 
@@ -35,5 +35,9 @@ void moveDBR(long step, MultiStepper &steppers);
 void rotateClockwise(long step, MultiStepper &steppers);
 
 void rotateAntiClockwise(long step, MultiStepper &steppers);
+
+void incinerate(Servo &servo);
+
+
 
 #endif

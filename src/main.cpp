@@ -9,6 +9,9 @@
 #include <Arduino.h>
 #include <ESP32Encoder.h>
 
+// #include "../../test/Test.h"
+
+
 #include "../../include/pinDef.h"
 #include "../../include/libDef.h"
 
@@ -17,11 +20,12 @@
 Servo tubeServo0;
 Servo tubeServo1;
 Servo hingeServo;
+Servo incinerateServo;
 ESP32Encoder tubeEncoder;
-AccelStepper fr(AccelStepper::DRIVER, STEP, DIR);
-AccelStepper fl(AccelStepper::DRIVER, STEP, DIR);
-AccelStepper br(AccelStepper::DRIVER, STEP, DIR);
-AccelStepper bl(AccelStepper::DRIVER, STEP, DIR);
+AccelStepper fr(AccelStepper::DRIVER, STEP1, DIR1);
+AccelStepper fl(AccelStepper::DRIVER, STEP2, DIR2);
+AccelStepper br(AccelStepper::DRIVER, STEP3, DIR3);
+AccelStepper bl(AccelStepper::DRIVER, STEP4, DIR4);
 MultiStepper steppers;
 
 
@@ -39,9 +43,9 @@ MultiStepper steppers;
 
 void setup()
 {
-    setupPins();//function in the pindef file whihc sets the input or output or other values of a pin
+  setupPins();//function in the pindef file whihc sets the input or output or other values of a pin
 
-//   Serial.begin(115200);
+  Serial.begin(115200);
 
   // these are the two servo motors responcible for extending/retracting the tube
   tubeServo0.attach(12);
@@ -49,6 +53,8 @@ void setup()
 
   tubeEncoder.attachHalfQuad(23, 22);
   tubeEncoder.setCount(0);
+
+  hingeServo.attach(HINGE);
 
   initialiseOled();
   initialiseJoystickIR();
@@ -83,19 +89,22 @@ void run(){
     blocking_setTubePos(0, tubeEncoder, tubeServo0, tubeServo1);//tube movement in 
 
     rotateClockwise(500, steppers);
+    moveForward(500, steppers);
 
-
-
+    incinerate(incinerateServo);
 
 
 }
 
 
 
-
-
 void loop()
 {
+    // run();
+
+    moveForward(500, steppers);
+    // hingeMovement(180, hingeServo);
+
 
 
   // blocking_setTubePos(T_SEED_1, tubeEncoder, tubeServos); // extend tube to seed 1 collection position
