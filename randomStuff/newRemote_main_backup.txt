@@ -1,0 +1,117 @@
+#include <Arduino.h>
+#include <Harley.h>
+#include <Marcus.h>
+#include <ESP32Servo.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#include <ESP32Encoder.h>
+#include <esp_now.h>
+#include <WiFi.h>
+
+Servo tubeServo1;
+Servo tubeServo2;
+ESP32Encoder tubeEncoder;
+
+// Remote address
+uint8_t remoteAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
+// recieved from the remote
+typedef struct struct_fromRemote
+{
+  int joystickX;
+  int joystickY;
+  int touchReading;
+} struct_fromRemote;
+
+struct_fromRemote fromRemote;
+
+typedef struct struct_fromRobot
+{
+  String topLine;
+  String bottomLine;
+} struct_fromRobot;
+
+struct_fromRobot fromRobot;
+
+esp_now_peer_info_t peerInfo;
+
+void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len); // called when data is received from the remote
+void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status);    // callback when data is sent
+
+unsigned long lastSend = 0; // millis timestamp for the last time we sent a message to the remote
+
+// tube length positions (these are placeholder values and completely wrong)
+#define T_FULL_RETRACT 0
+#define T_SEED_1 50
+#define T_SEED_2 100
+#define T_SEED_3 150
+#define T_SEED_4 200
+#define T_SEED_5 250
+#define T_SEED_6 300
+
+void setup()
+{
+  // put your setup code here, to run once:
+  Serial.begin(115200);
+  WiFi.mode(WIFI_STA);
+
+  // Init ESP-NOW
+  if (esp_now_init() != ESP_OK)
+  {
+    Serial.println("Error initializing ESP-NOW");
+    return;
+  }
+
+  // Once ESPNow is successfully Init, we will register for recv CB to
+  // get recv packer info
+  esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
+
+  // these are the two servo motors responcible for extending/retracting the tube
+  tubeServo1.attach(12);
+  tubeServo2.attach(13);
+  // ensure the servos are stationary upon startup
+  tubeServo1.write(90);
+  tubeServo2.write(90);
+
+  tubeEncoder.attachHalfQuad(23, 22);
+  tubeEncoder.setCount(0);
+
+  initialiseOled();
+  initialiseJoystickIR();
+
+  installTube(tubeServo1, tubeServo2, tubeEncoder);
+}
+
+void loop()
+{
+  if (millis() >= lastSend + 150)
+  {
+    fromRobot.topLine = oledTop;
+    fromRobot.bottomLine = oledBottom;
+    esp_err_t result = esp_now_send(remoteAddress, (uint8_t *)&fromRemote, sizeof(fromRemote));
+    lastSend = millis();
+  }
+
+  // *****
+  // Robot code here
+  // *****
+
+  // blocking_setTubePos(T_SEED_1, tubeEncoder, tubeServo1, tubeServo2); // extend tube to seed 1 collection position
+
+  // harleyBlink(250);
+}
+
+// callback function that will be executed when data is received
+void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
+{
+  memcpy(&fromRemote, incomingData, sizeof(fromRemote));
+  updateRecievedRemote(fromRemote.joystickX, fromRemote.joystickY, fromRemote.touchReading);
+}
+
+// callback function when data is sent
+void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
+{
+  Serial.print("\r\nLast Packet Send Status:\t");
+  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+}

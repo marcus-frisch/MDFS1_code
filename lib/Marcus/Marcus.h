@@ -9,6 +9,9 @@
 #include <ESP32Encoder.h>
 #include "../../include/pinDef.h"
 
+extern String oledTop;
+extern String oledBottom;
+
 /**
  * @brief Initilaises the olde screen
  */
@@ -18,6 +21,8 @@ void initialiseOled();
  * @brief initialises the joystick
  */
 void initialiseJoystickIR();
+
+void updateRecievedRemote(int joyX, int joyY, int touch);
 
 /**
  * @brief reads the button state
@@ -31,14 +36,19 @@ bool readButton();
 void marcusBlink(int time);
 
 /**
+ * @brief send Strings to the OLED on the remote
+ */
+void printText(String topLine, String bottomLine);
+
+/**
+ * @brief ESP-NOW status shown by flashing on-board LED
+ */
+void statusLed(bool status);
+
+/**
  * @return reading from joystick X axis within servo.write() range
  */
 int servoJoystickX();
-
-/**
- * @brief test servo object
- */
-void marcusServoTest(Servo &servoMotor, Servo &servoMotor1);
 
 /**
  * @brief initial install of tube into the robot (requires operator assistance)
